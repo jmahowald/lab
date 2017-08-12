@@ -1,0 +1,65 @@
+Name: fullstack
+Modules:
+- Name: network
+  outputs:
+  - vpc_id
+  - vpc_cidr
+  - public_subnet_ids
+  - public_sg_id
+  - availabity_zones
+  - public_cidrs
+  uri: /Users/josh/workspace/projects/terraform/terraform-aws-vpc//modules/network
+  module_vars:
+  - module_name: amazon-amis
+    mappings:
+    - source_var_name: ami_id
+      var_name: ami
+    - var_name: image_user
+  # The network module get's it's ami id from the ami module specified below'
+  vars:
+  - var_name: availability_zone_count
+    default: 3
+  - var_name: aws_region
+    default: us-east-1
+  - var_name: environment
+    default: dev-blue
+  - var_name: owner
+    default: <no value>
+  - var_name: vpc_cidr
+    default: 10.100.0.0/16
+  - var_name: public_subnet_cidrs
+    type: list
+    defaults:
+    - 10.100.0.0/24
+    - 10.100.1.0/24
+    - 10.100.2.0/24
+  - var_name: private_subnet_cidrs
+    type: list
+    defaults:
+    - 10.100.10.0/24
+    - 10.100.11.0/24
+    - 10.100.12.0/24
+- Name: amazon-amis
+  local_path: /Users/josh/workspace/projects/terraform/terraform-aws-vpc//modules/amazon-amis
+
+# - Name: ecs
+#   uri: <no value>/cluster
+#   outputs:
+#   - elb_hostname 
+#   module_vars:
+#   - module_name: network
+#     mappings:
+#     - source_var_name: public_subnet_ids
+#       var_name: elb_subnet_ids
+#     - source_var_name: public_subnet_ids
+#       var_name: asg_subnet_ids
+#   vars:
+#   - var_name: key_name
+#   - var_name: asg_min
+#     default: 1
+#   - var_name: asg_max
+#     default: 3
+#   - var_name: asg_desired
+#     default: 1
+# - Name: amazon-amis
+#   local_path: ../modules/amazon-amis

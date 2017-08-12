@@ -1,0 +1,24 @@
+Name: vpn
+Modules:
+- Name: vpn
+  Outputs: null
+  local_path: ../../external/terraform-aws-vpc//modules/vpn
+  remote_source_vars:
+  - source_name: vpc_layer
+    mappings:
+    - source_var_name: bastion_ips[0]
+      var_name: host_address
+    - var_name: host_user
+      source_var_name: bastion_user
+    - var_name: vpn_cidr
+      source_var_name: vpc_cidr
+    - var_name: security_group_id
+      source_var_name: public_sg_id
+    config:
+      bucket: terraform.{{.Env.ENV_NAME}}.backpackhealth.com
+      key: env:/{{.Env.ENV_NAME}}/basevpc/terraform.tfstate
+      region: {{.Env.REMOTE_STATE_BUCKET_REGION}}
+  vars:
+  - var_name: ssh_keypath
+  # - var_name: docker_preinstalled
+  #   default: true

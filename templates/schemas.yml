@@ -1,0 +1,24 @@
+Name: schemas
+Modules:
+- Name: schemas
+  local_path: ../../modules/mysql
+  remote_source_vars:
+  - source_name: rds
+    config:
+      bucket: terraform.{{.Env.ENV_NAME}}.backpackhealth.com
+      key: env:/{{.Env.ENV_NAME}}/rds/terraform.tfstate
+      region: {{.Env.REMOTE_STATE_BUCKET_REGION}}
+    mappings:
+    - var_name: database_address
+  vars:
+  - source_var_name: rds_password
+    var_name: password
+  - var_name: schema_names
+    type: list
+    defaults:
+    - backpackdev
+    - backpackqa
+    - medlidev
+    - medliqa
+    - billingdev
+    - billingqa

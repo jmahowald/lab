@@ -1,0 +1,20 @@
+Name: ecs_infra
+Modules:
+- Name: ecs_infra 
+  local_path: git@github.com:backpackhealth/terraform-ecs-modules//infrastructure
+  outputs:
+  - ecs_role_arn
+  remote_source_vars:
+  - source_name: vpc_layer
+    config:
+      bucket: {{.Env.REMOTE_STATE_BUCKET}}
+      key: {{.Env.VPC_KEY}}
+      region: {{.Env.REMOTE_STATE_BUCKET_REGION}}
+    mappings:
+    - var_name: public_security_group_id  
+      source_var_name: public_sg_id
+    - var_name: private_security_group_id  
+      source_var_name: private_sg_id
+  vars:
+  - var_name: environment
+    default: {{.Env.ENV_COLOR}}

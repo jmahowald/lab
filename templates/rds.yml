@@ -1,0 +1,77 @@
+Name: rds
+Modules:
+- Name: dbsubnet
+  local_path: ../../external/terraform-aws-vpc/modules/mysql-rds-network
+  orig_uri: github.com/jmahowald/terraform-aws-vpc//modules/mysql-rds-network
+  vars:
+  - var_name: db_subnet_group_name  
+    default: {{.Env.ENV_NAME}}-rds-subnet
+  outputs:
+  - db_subnet_group_name
+  remote_source_vars:
+    - source_name: vpc_layer
+      config:
+        bucket: terraform.{{.Env.ENV_NAME}}.backpackhealth.com
+        key: env:/{{.Env.ENV_NAME}}/basevpc/terraform.tfstate
+        region: {{.Env.REMOTE_STATE_BUCKET_REGION}}
+      mappings:
+      - source_var_name: private_subnet_ids
+        var_name: subnet_ids
+- Name: rds_sec_groups
+  outputs:
+  - security_group_id
+  local_path: ../../modules/rds/sec-groups
+  remote_source_vars:
+  - source_name: vpc_layer
+    config:
+      bucket: terraform.{{.Env.ENV_NAME}}.backpackhealth.com
+      key: basevpc/terraform.tfstate
+      region: {{.Env.REMOTE_STATE_BUCKET_REGION}}
+    mappings:
+    - var_name: vpc_id
+    - var_name: inbound_security_group_ids
+      source_var_name: all_sg_ids
+  vars:
+  - var_name: environment_name
+    default: {{.Env.ENV_NAME}}-rds
+  - var_name: num_inbound_security_groups
+    default: 2   
+- Name: dbinstance_primary
+  outputs:
+  - database_address
+  - rds_identifier
+  local_path: ../../modules/rds/primary
+  module_vars:
+  - module_name: rds_sec_groups
+    mappings:
+    - var_name: db_security_group
+      source_var_name: security_group_id
+  - module_name: dbsubnet
+    mappings:
+    - var_name: db_subnet_group_name
+  vars:
+  - var_name: rds_password 
+  - var_name: allocated_storage
+    default: 50
+  - var_name: instance_class
+    default: db.t2.medium
+  - var_name: identifier
+    default: {{.Env.ENV_NAME}}-rds-primary
+# - Name: schmeas
+#   local_path: ../../modules/mysql
+#   module_vars:
+#   - module_name: dbinstance_primary
+#     mappings:
+#     - var_name: endpoint
+#       source_var_name: database_address
+#   vars:
+#   - source_var_name: rds_password
+#     var_name: password
+#   - var_name: num_schemas
+#     default: 3 
+#   - var_name: schema_names
+#     type: list
+#     defaults:
+#     - backpack
+#     - rancher
+#     - medli

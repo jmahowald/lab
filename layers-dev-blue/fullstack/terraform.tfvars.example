@@ -1,0 +1,8 @@
+
+availability_zone_count="3"
+aws_region="us-east-1"
+environment="dev-blue"
+owner="&lt;no value&gt;"
+vpc_cidr="10.100.0.0/16"
+public_subnet_cidrs=""
+private_subnet_cidrs=""
