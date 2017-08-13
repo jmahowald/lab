@@ -1,7 +1,0 @@
-
-environment=""
-db_subnet_group_name="dev-blue"
-num_azs="2"
-aurora_password=""
-instance_class="db.t2.small"
-identifier_prefix="dev-blue"
