@@ -9,6 +9,8 @@ Modules:
   - all_sg_ids  
   - public_sg_id
   - availabity_zones
+  - bastion_user
+  - bastion_ips
   uri: {{.Env.TF_VPC_LOCATION}}//modules/network
   module_vars:
   - module_name: sshkey
