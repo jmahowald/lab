@@ -14,10 +14,9 @@ Modules:
     - var_name: security_group_id
       source_var_name: public_sg_id
     config:
-      bucket: terraform.{{.Env.ENV_NAME}}.backpackhealth.com
+      bucket: {{.Env.REMOTE_STATE_BUCKET}}
       key: env:/{{.Env.ENV_NAME}}/basevpc/terraform.tfstate
       region: {{.Env.REMOTE_STATE_BUCKET_REGION}}
   vars:
-  - var_name: ssh_keypath
-  # - var_name: docker_preinstalled
+  - var_name: ssh_keypath  # - var_name: docker_preinstalled
   #   default: true
