@@ -1,38 +1,33 @@
-Dependencies:
-  - bucketterraform
 Name: basevpc
 Modules:
 - Name: network
   outputs:
   - vpc_id
-  - bastion_user
-  - private_subnet_ids
   - vpc_cidr
-  - bastion_ips
   - public_subnet_ids
   - public_sg_id
   - availabity_zones
-  - private_sg_id
-  - all_sg_ids
-  local_path: ../../external/terraform-aws-vpc//modules/network
+  uri: {{.Env.TF_VPC_LOCATION}}//modules/network
   module_vars:
+  - module_name: sshkey
+    mappings:
+    - source_var_name: key_path
+      var_name: ssh_keypath
   - module_name: amazon-amis
     mappings:
     - source_var_name: ami_id
       var_name: ami
     - var_name: image_user
-  remote_source_vars: null
   vars:
-  - var_name: aws_region
-    default: {{.Env.AWS_DEFAULT_REGION}}
+  - var_name: key_name
   - var_name: availability_zone_count
     default: 2
-  - var_name: bastion_server_count
-    default: 1
+  - var_name: aws_region
+    default: {{.Env.AWS_DEFAULT_REGION}}
   - var_name: environment
     default: {{.Env.ENV_NAME}}
   - var_name: owner
-    default: backpacksys
+    default: {{.Env.OWNER}}
   - var_name: vpc_cidr
     default: {{.Env.VPC_CIDR_OCTET}}.0.0/16
   - var_name: public_subnet_cidrs
@@ -40,20 +35,73 @@ Modules:
     defaults:
     - {{.Env.VPC_CIDR_OCTET}}.0.0/24
     - {{.Env.VPC_CIDR_OCTET}}.1.0/24
-
   - var_name: private_subnet_cidrs
     type: list
     defaults:
     - {{.Env.VPC_CIDR_OCTET}}.10.0/24
     - {{.Env.VPC_CIDR_OCTET}}.11.0/24
+    - {{.Env.VPC_CIDR_OCTET}}.12.0/24
 
-  - var_name: key_name
-    default: {{.Env.ENV_NAME}}
-  - var_name: ssh_keypath
 - Name: amazon-amis
-  local_path: ../../external/terraform-aws-vpc//modules/amazon-amis
-  optional_vars:
-  - channel
-  - virtualization_type
-  - version
-  vars: []
+  uri: {{.Env.TF_VPC_LOCATION}}//modules/amazon-amis
+- Name: sshkey
+  uri: {{.Env.TF_VPC_LOCATION}}//modules/keys/keygen
+  vars:
+  - var_name: key_dir
+  - var_name: key_name
+- Name: awskey
+  uri: {{.Env.TF_VPC_LOCATION}}//modules/keys
+  module_vars:
+  - module_name: sshkey
+    mappings:
+    - var_name: public_key
+  vars:
+  - var_name: key_name
+- Name: ecs_infra 
+  uri: {{.Env.TF_ECS_LOCATION}}/infrastructure
+  outputs:
+  - ecs_role_arn
+  module_vars:
+  - module_name: network
+    mappings:
+    - var_name: public_security_group_id  
+      source_var_name: public_sg_id
+    - var_name: private_security_group_id  
+      source_var_name: private_sg_id
+  vars:
+  - var_name: environment
+    default: {{.Env.ENV_NAME}}
+
+- Name: ecs
+  uri: {{.Env.TF_ECS_LOCATION}}/cluster
+  outputs: 
+  - cluster_id
+  - public_listener_arns
+  - asg_name
+  - cloudwatch_log_group_prefix
+  module_vars:
+  - module_name: ecs_infra
+    mappings:
+    - var_name: ecs_role_arn
+  - module_name: network
+    mappings:
+    - source_var_name: public_subnet_ids
+      var_name: elb_subnet_ids
+    - source_var_name: private_subnet_ids
+      var_name: asg_subnet_ids
+    - source_var_name: private_sg_id  
+      var_name: instance_security_group_id
+    - var_name: private_subnet_ids
+    - var_name: public_subnet_ids
+    - var_name: public_security_group_id  
+      source_var_name: public_sg_id
+    - var_name: private_security_group_id  
+      source_var_name: private_sg_id
+  vars:
+  - var_name: key_name
+  - var_name: environment
+  - var_name: zone_name
+  - var_name: environment
+  - var_name: autoscaling_group_name
+    default: tf-ecs-{{.Env.ENV_NAME}}
+  
