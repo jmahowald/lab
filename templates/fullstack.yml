@@ -57,24 +57,64 @@ Modules:
     - var_name: public_key
   vars:
   - var_name: key_name
+- Name: ecs_infra 
+  uri: {{.Env.TF_ECS_LOCATION}}/infrastructure
+  outputs:
+  - ecs_role_arn
+  module_vars:
+  - module_name: network
+    mappings:
+    - var_name: public_security_group_id  
+      source_var_name: public_sg_id
+    - var_name: private_security_group_id  
+      source_var_name: private_sg_id
+  vars:
+  - var_name: environment
+    default: {{.Env.ENV_NAME}}
+- Name: db_network
+  uri: {{.Env.TF_VPC_LOCATION}}//modules/mysql-rds-network
+  module_vars:
+  - module_name: network
+    mappings:
+    - var_name: subnet_ids  
+      source_var_name: private_subnet_ids
+    - var_name: inbound_security_group_ids 
+      # TODO formterra doesn't handle changing single vars into lists, and we eventually would
+      # only want the private security group to access.  During dev though it's useful 
+      # to allow the public sg id as that's where VPN access comes from
+      source_var_name: all_sg_ids
+  vars:
+  - var_name: environment
 - Name: ecs
   uri: {{.Env.TF_ECS_LOCATION}}/cluster
-  outputs:
-  - elb_hostname 
+  outputs: 
+  - cluster_id
+  - public_listener_arns
+  - asg_name
+  - cloudwatch_log_group_prefix
   module_vars:
+  - module_name: ecs_infra
+    mappings:
+    - var_name: ecs_role_arn
   - module_name: network
     mappings:
     - source_var_name: public_subnet_ids
       var_name: elb_subnet_ids
-    - source_var_name: public_subnet_ids
+    - source_var_name: private_subnet_ids
       var_name: asg_subnet_ids
+    - source_var_name: private_sg_id  
+      var_name: instance_security_group_id
+    - var_name: private_subnet_ids
+    - var_name: public_subnet_ids
+    - var_name: public_security_group_id  
+      source_var_name: public_sg_id
+    - var_name: private_security_group_id  
+      source_var_name: private_sg_id
   vars:
   - var_name: key_name
-  - var_name: asg_min
-    default: 1
-  - var_name: asg_max
-    default: 3
-  - var_name: asg_desired
-    default: 1
-# - Name: amazon-amis
-#   local_path: ../modules/amazon-amis
+  - var_name: environment
+  - var_name: zone_name
+  - var_name: environment
+  - var_name: autoscaling_group_name
+    default: tf-ecs-{{.Env.ENV_NAME}}
+  
