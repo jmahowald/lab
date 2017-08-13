@@ -1,0 +1,55 @@
+Name: aurora
+Modules:
+- Name: db_network
+  uri: {{.Env.TF_VPC_LOCATION}}//modules/mysql-rds-network
+  module_vars:
+  - module_name: network
+    mappings:
+    - var_name: subnet_ids  
+      source_var_name: private_subnet_ids
+    - var_name: inbound_security_group_ids 
+      # TODO formterra doesn't handle changing single vars into lists, and we eventually would
+      # only want the private security group to access.  During dev though it's useful 
+      # to allow the public sg id as that's where VPN access comes from
+      source_var_name: all_sg_ids
+  vars:
+  - var_name: environment
+  - var_name: db_subnet_group_name  
+    default: {{.Env.ENV_NAME}}
+  outputs:
+  - db_subnet_group_name
+  remote_source_vars:
+    - source_name: vpc_layer
+      config:
+        bucket: {{.Env.REMOTE_STATE_BUCKET}}
+        key: env:/{{.Env.ENV_NAME}}/basevpc/terraform.tfstate
+        region: {{.Env.REMOTE_STATE_BUCKET_REGION}}
+      mappings:
+      - var_name: subnet_ids
+        source_var_name: private_subnet_ids
+      - var_name: inbound_security_group_ids 
+        # TODO formterra doesn't handle changing single vars into lists, and we eventually would
+        # only want the private security group to access.  During dev though it's useful 
+        # to allow the public sg id as that's where VPN access comes from
+        source_var_name: all_sg_ids
+
+
+- Name: db
+  uri: {{.Env.TF_VPC_LOCATION}}//modules/aurora
+  outputs:
+  - database_address
+  - rds_identifier
+  module_vars:
+  - module_name: db_network
+    mappings:
+    - var_name: db_security_group
+      source_var_name: security_group_id
+    - var_name: db_subnet_group_name
+  vars:
+  - var_name: num_azs
+    default: 2
+  - var_name: aurora_password 
+  - var_name: instance_class
+    default: db.t2.small
+  - var_name: identifier_prefix
+    default: {{.Env.ENV_NAME}}

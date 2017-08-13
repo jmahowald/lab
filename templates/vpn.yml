@@ -1,8 +1,7 @@
 Name: vpn
 Modules:
 - Name: vpn
-  Outputs: null
-  local_path: ../../external/terraform-aws-vpc//modules/vpn
+  uri: {{.Env.TF_VPC_LOCATION}}//modules/vpn
   remote_source_vars:
   - source_name: vpc_layer
     mappings:

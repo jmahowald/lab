@@ -5,6 +5,8 @@ Modules:
   - vpc_id
   - vpc_cidr
   - public_subnet_ids
+  - private_subnet_ids
+  - all_sg_ids  
   - public_sg_id
   - availabity_zones
   uri: {{.Env.TF_VPC_LOCATION}}//modules/network

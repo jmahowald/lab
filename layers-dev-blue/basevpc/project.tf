@@ -50,6 +50,12 @@ output "vpc_cidr" {
 output "public_subnet_ids" {
   value = "${module.network.public_subnet_ids}"
 } 
+output "private_subnet_ids" {
+  value = "${module.network.private_subnet_ids}"
+} 
+output "all_sg_ids" {
+  value = "${module.network.all_sg_ids}"
+} 
 output "public_sg_id" {
   value = "${module.network.public_sg_id}"
 } 
@@ -90,15 +96,6 @@ module "ecs_infra" {
 output "ecs_role_arn" {
   value = "${module.ecs_infra.ecs_role_arn}"
 } 
-
-module "db_network" {
-  source = "/Users/josh/workspace/projects/terraform/terraform-aws-vpc//modules/mysql-rds-network"
-  subnet_ids = "${module.network.private_subnet_ids}"
-  inbound_security_group_ids = "${module.network.all_sg_ids}"
-  environment = "${var.environment}"
-}
-
-
 
 module "ecs" {
   source = "/Users/josh/workspace/projects/lab/terraform-ecs/terraform-ecs-modules//cluster"
