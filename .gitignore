@@ -1,1 +1,3 @@
 .terraform/
+build*/*
+terraform.tfstate.d/
