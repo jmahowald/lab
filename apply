@@ -1,4 +1,4 @@
 #!/bin/bash
 
 
-make  build-$ENV_NAME/$1.apply
+make  build-$ENV_NAME/$1.apply -B
