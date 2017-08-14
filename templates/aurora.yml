@@ -32,8 +32,6 @@ Modules:
         # only want the private security group to access.  During dev though it's useful 
         # to allow the public sg id as that's where VPN access comes from
         source_var_name: all_sg_ids
-
-
 - Name: db
   uri: {{.Env.TF_VPC_LOCATION}}//modules/aurora
   outputs:

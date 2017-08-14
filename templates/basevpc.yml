@@ -79,6 +79,7 @@ Modules:
 - Name: ecs
   uri: {{.Env.TF_ECS_LOCATION}}/cluster
   outputs: 
+  - cluster_name
   - cluster_id
   - public_listener_arns
   - asg_name

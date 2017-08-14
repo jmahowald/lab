@@ -2,7 +2,13 @@
 variable "service_name" {default = "blog"}
 variable "priority" {default = 10}
 variable "health_check" {
-  default = []
+  default = [ 
+    {
+      path = "/wp-admin/install.php"
+      interval = 300
+    }
+
+  ]
 }
 
 

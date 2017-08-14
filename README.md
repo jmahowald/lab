@@ -30,3 +30,11 @@ for the vpc/elb layer it will first have to have the s3 bucket for elb logs empt
 
 
 `aws s3 rm --recursive s3://elb.logs.$TF_VAR_zone_name`
+
+
+If you change the outputs in a template, you'll want to regenerate the terrafomr
+`plan <layername>`
+
+Then run terraform refresh in the layer (no top level command yet)
+
+cd build-$ENV_NAME/<layer>; terraform refresh
