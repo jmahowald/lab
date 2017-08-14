@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+make  build-$ENV_NAME/$1.plan -B
