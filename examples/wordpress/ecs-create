@@ -1,0 +1,23 @@
+#!/bin/bash -x
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+ECS_INFO_DIR=$DIR/../../layers-$ENV_NAME/basevpc
+DB_INFO_DIR=$DIR/../../layers-$ENV_NAME/aurora
+TG_INFO_DIR=$DIR/../../layers-$ENV_NAME/wordpress
+cd $ECS_INFO_DIR
+
+cluster=$(terraform output cluster_name)
+role=$(terraform output ecs_role_arn)
+
+cd $TG_INFO_DIR
+tg_arn=$(terraform output target_group_arn)
+
+cd $DB_INFO_DIR
+db_address=$(terraform output database_address)
+
+cd $DIR
+
+WORDPRESS_DB_PASSWORD=$TF_VAR_aurora_password WORDPRESS_DB_HOST=$db_address \
+    ecs-cli compose service up --cluster $cluster --target-group-arn $tg_arn \
+    --role $role --container-name wordpress --container-port 80

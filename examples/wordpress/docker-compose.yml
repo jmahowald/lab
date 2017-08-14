@@ -1,0 +1,17 @@
+version: 2
+services:
+  wordpress:
+    logging: 
+      driver: awslogs
+      options:
+        awslogs-group: tf-ecs-${ENV_NAME}/blog
+        awslogs-region: ${AWS_DEFAULT_REGION}
+        awslogs-stream-prefix: wordpress
+    image: wordpress:latest # https://hub.docker.com/_/wordpress/
+    ports:
+    - 80
+    environment:
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}

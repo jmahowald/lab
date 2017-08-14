@@ -1,0 +1,25 @@
+Name: wordpress
+Modules:
+- Name: wordpress
+  outputs:
+  - target_group_arn
+  local_path: ../../examples/wordpress
+  vars:
+  - var_name: zone_name
+  remote_source_vars:
+  - source_name: ecs_layer
+    config:
+      bucket: {{.Env.REMOTE_STATE_BUCKET}}
+      key: env:/{{.Env.ENV_NAME}}/basevpc/terraform.tfstate
+      region: {{.Env.REMOTE_STATE_BUCKET_REGION}}
+    mappings:
+    - var_name: vpc_id
+    - var_name: listener_arn
+      source_var_name: public_listener_arns[0]
+    - var_name: cluster_name
+    - var_name: ecs_arn
+      source_var_name: ecs_role_arn
+    - var_name: log_group_prefix
+      source_var_name: cloudwatch_log_group_prefix
+        
+

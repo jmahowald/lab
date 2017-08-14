@@ -20,3 +20,13 @@ to actually create it run
 
 
 `make build-$ENV_NAME/<layername>.apply`
+
+
+IF deleting, go down to the individual layers (layers-${ENV_NAME}/<layername>)
+and run make clean
+
+
+for the vpc/elb layer it will first have to have the s3 bucket for elb logs emptied
+
+
+`aws s3 rm --recursive s3://elb.logs.$TF_VAR_zone_name`

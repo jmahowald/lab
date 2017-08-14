@@ -1,0 +1,3 @@
+cd $DB_INFO_DIR
+db_address=$(terraform output database_address || echo "unknown")
+
