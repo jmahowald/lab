@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Override the image name used for local development
-IMAGE_NAME=${CLOUD_WORKSTATION_IMAGE:-artifactory.corp.code42.com:5000/c42/cloud-workstation}
+IMAGE_NAME=${CLOUD_WORKSTATION_IMAGE:-joshmahowald/cloud-workstation}
 
 if [[ $1 == '--update' ]]; then
     echo "updating underlying image"
